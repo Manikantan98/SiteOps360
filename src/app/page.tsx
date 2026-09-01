@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Activity, Building2, CalendarCheck, ClipboardList, HardHat, LayoutDashboard, MapPin, Settings, Users, Plus, Search, CheckCircle2, Clock3 } from 'lucide-react';
+import { Activity, Building2, CalendarCheck, ClipboardList, HardHat, LayoutDashboard, MapPin, Settings, Users, Plus, Search, CheckCircle2, Clock3, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 
 const navItems = [
   ['Dashboard', LayoutDashboard], ['Projects & Sites', Building2], ['Workforce', Users],
@@ -30,11 +30,14 @@ const initialTasks: Task[] = [
 ];
 
 export default function Home() {
+  const [authenticated, setAuthenticated] = useState(false);
   const [active, setActive] = useState('Dashboard');
   const [sites, setSites] = useState(initialSites);
   const [workers, setWorkers] = useState(initialWorkers);
   const [tasks, setTasks] = useState(initialTasks);
   const [notice, setNotice] = useState('');
+
+  if (!authenticated) return <Login onLogin={() => setAuthenticated(true)} />;
 
   function addSite() {
     const next = sites.length + 1;
@@ -74,6 +77,57 @@ export default function Home() {
       </div>
     </main>
   </div>;
+}
+
+function Login({ onLogin }: { onLogin: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !password) { setError('Please enter your email and password.'); return; }
+    setError('');
+    onLogin();
+  }
+
+  return <main className="login-page">
+    <section className="login-visual" aria-hidden="true">
+      <div className="visual-overlay" />
+      <div className="skyline">
+        <div className="building b1"><i/><i/><i/><i/><i/></div>
+        <div className="building b2"><i/><i/><i/><i/><i/><i/><i/></div>
+        <div className="building b3"><i/><i/><i/><i/><i/><i/></div>
+        <div className="building b4"><i/><i/><i/><i/><i/><i/><i/><i/></div>
+        <div className="building b5"><i/><i/><i/><i/><i/></div>
+        <div className="building b6"><i/><i/><i/><i/><i/><i/><i/><i/><i/></div>
+        <div className="crane"><span/><b/></div>
+      </div>
+      <div className="visual-copy">
+        <div className="brand light"><span className="logo"><HardHat size={21}/></span>SiteOps360</div>
+        <h1>Build smarter.<br/>Operate better.</h1>
+        <p>One platform for projects, sites, workforce and daily construction operations.</p>
+        <div className="visual-points"><span>✓ Workforce visibility</span><span>✓ Site execution</span><span>✓ Real-time operations</span></div>
+      </div>
+    </section>
+
+    <section className="login-panel">
+      <div className="login-box">
+        <div className="mobile-brand"><span className="logo"><HardHat size={20}/></span>SiteOps360</div>
+        <div className="login-heading"><span className="login-icon"><LockKeyhole size={20}/></span><div><h2>Welcome back</h2><p>Sign in to your SiteOps360 account</p></div></div>
+        <form onSubmit={submit} className="login-form">
+          <label>Email address<div className="input-wrap"><Mail size={17}/><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@company.com" autoComplete="email"/></div></label>
+          <label>Password<div className="input-wrap"><LockKeyhole size={17}/><input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" autoComplete="current-password"/><button type="button" className="icon-btn" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <EyeOff size={17}/> : <Eye size={17}/>}</button></div></label>
+          <div className="login-options"><label className="remember"><input type="checkbox"/> Remember me</label><button type="button" className="forgot">Forgot password?</button></div>
+          {error && <div className="login-error">{error}</div>}
+          <button className="login-submit" type="submit">Sign in <span>→</span></button>
+        </form>
+        <div className="login-divider"><span>Secure construction operations</span></div>
+        <p className="login-footer">© 2026 SiteOps360 · Enterprise Site Management</p>
+      </div>
+    </section>
+  </main>;
 }
 
 function Dashboard({ sites, workers, tasks }: { sites: Site[]; workers: Worker[]; tasks: Task[] }) {
